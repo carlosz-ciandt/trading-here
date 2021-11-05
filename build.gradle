@@ -1,0 +1,115 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'groovy'
+}
+
+group = 'com.trading'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '14'
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	testComponent {
+		test.groovy.srcDirs += "$projectDir/src/testComponent/groovy"
+		test.resources.srcDirs += "$projectDir/src/testComponent/resources"
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+}
+
+configurations {
+	testComponentCompile.extendsFrom testCompile
+	testComponentRuntime.extendsFrom testRuntime
+	testComponentRuntimeOnly.extendsFrom testRuntimeOnly
+	testComponentImplementation.extendsFrom testImplementation
+}
+
+task testComponent(type: Test) {
+	testClassesDirs = sourceSets.testComponent.output.classesDirs
+	classpath = sourceSets.testComponent.runtimeClasspath
+
+	useJUnitPlatform()
+
+	reports {
+		html.enabled true
+		junitXml.enabled = true
+	}
+}
+
+check.dependsOn 'test-component'
+
+ext {
+	set('springCloudVersion', "2020.0.4")
+	set('testcontainersVersion', "1.16.0")
+	set('springfoxVersion', "3.0.0")
+	set('lombokVersion', "1.18.22")
+	set('guavaVersion', "31.0.1-jre")
+	set('mapstructVersion', "1.4.2.Final")
+	set('logbackClassicVersion', "1.2.6")
+	set('logstashLogbackEncoderVersion', "6.6")
+	set('sfmJdbcVersion', "8.2.3")
+	set('lombokMapstructBindingVersion', "0.2.0")
+	set('spockCoreVersion', "2.0-groovy-2.5")
+	set('fixtureFactoryVersion', "3.1.0")
+	set('wiremockStandaloneVersion', "2.27.2")
+	set('restAssuredVersion', "4.2.0")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	implementation("io.springfox:springfox-swagger2:${property('springfoxVersion')}")
+	implementation("io.springfox:springfox-swagger-ui:${property('springfoxVersion')}")
+	implementation "org.mapstruct:mapstruct:${property('mapstructVersion')}"
+
+	compileOnly "org.projectlombok:lombok:${property('lombokVersion')}"
+	implementation "com.google.guava:guava:${property('guavaVersion')}"
+	implementation "ch.qos.logback:logback-classic:${property('logbackClassicVersion')}"
+	implementation "net.logstash.logback:logstash-logback-encoder:${property('logstashLogbackEncoderVersion')}"
+	implementation "org.simpleflatmapper:sfm-springjdbc:${property('sfmJdbcVersion')}"
+
+	annotationProcessor "org.mapstruct:mapstruct-processor:${property('mapstructVersion')}"
+	annotationProcessor "org.projectlombok:lombok:${property('lombokVersion')}"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${property('lombokMapstructBindingVersion')}"
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	testCompileOnly "org.projectlombok:lombok:${property('lombokVersion')}"
+	testAnnotationProcessor "org.projectlombok:lombok:${property('lombokVersion')}"
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
+	testImplementation "org.spockframework:spock-core:${property('spockCoreVersion')}"
+	testImplementation "org.spockframework:spock-spring:${property('spockCoreVersion')}"
+	testImplementation "br.com.six2six:fixture-factory:${property('fixtureFactoryVersion')}"
+	testImplementation "com.github.tomakehurst:wiremock-standalone:${property('wiremockStandaloneVersion')}"
+	testImplementation "io.rest-assured:rest-assured:${property('restAssuredVersion')}"
+	testImplementation "io.rest-assured:json-path:${property('restAssuredVersion')}"
+	testImplementation "io.rest-assured:xml-path:${property('restAssuredVersion')}"
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+processResources {
+	expand(project.properties)
+}

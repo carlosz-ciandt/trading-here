@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+info:
+  app:
+    group: ${group}
+    name: ${name}
+    description: ${description}
+    version: ${version}
+  javaVendor: \${java.specification.vendor}
+
+application:
+  swagger:
+    apis:
+      path: /api/.*
+      base-package: com.trading.tradinghere.entrypoint.rest
+
+spring:
+  application:
+    name: ${name}
+    version: ${version}
+  thymeleaf:
+    enabled: false
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  main:
+    allow-bean-definition-overriding: true
+    banner-mode: off
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres_db?currentSchema=sch_trading
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    type: com.zaxxer.hikari.HikariDataSource
+    sqlScriptEncoding: UTF-8
+    initialization-mode: never
+    liquibase:
+      change-log: classpath:/db/proposal-analysis/changelog/db.changelog-proposal-analysis-master.yaml
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 1800000
+      minimumIdle: 5
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useUnicode: true
+        characterEncoding: UTF-8
+
+feign:
+  hystrix:
+    enabled: false
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      slidingWindowType: TIME_BASED
+      slidingWindowSize: 60
+      minimumNumberOfCalls: 7
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 60s
+      ignoreExceptions:
+        - org.springframework.web.client.HttpClientErrorException
+  instances:
+    featureFlag:
+      baseConfig: default

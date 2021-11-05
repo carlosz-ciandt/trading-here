@@ -1,0 +1,37 @@
+feign:
+  hystrix:
+    enabled: false
+
+resilience4j:
+  circuitbreaker:
+    circuitBreakerAspectOrder: 2
+  retry:
+    retryAspectOrder: 1
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      slidingWindowType: TIME_BASED
+      slidingWindowSize: 60
+      minimumNumberOfCalls: 7
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 60s
+      ignoreExceptions:
+        - org.springframework.web.client.HttpClientErrorException
+  instances:
+    proposalHealthAndDental:
+      baseConfig: default
+    proposalDental:
+      baseConfig: default
+    bureauLegalPerson:
+      baseConfig: default
+    bureauPhysicalPerson:
+      baseConfig: default
+
+spring:
+  datasource:
+    url: ${spring.datasource.url.container}
+    username: ${spring.datasource.username.container}
+    password: ${spring.datasource.password.container}
