@@ -46,7 +46,7 @@ docker-compose down
 ```
 Open [`http://localhost:8080/swagger-ui/`](http://localhost:8080/swagger-ui/) to use endpoints from application
 
-* default port restaurant app is `8080`
+* default port app is `8080`
 
 #### Build application
 ```
